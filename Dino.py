@@ -13,7 +13,9 @@ pygame.display.set_caption('Dinosaur Game')
 screen.fill((255, 255, 255))
 dinopos = [100, 500]
 keys = [False, False, False]
+
 # Loading sprites
+
 dino1 = pygame.image.load("GameData/Sprites/dinorun0000.png")
 dino2 = pygame.image.load("GameData/Sprites/dinorun0001.png")
 dinoduck0 = pygame.image.load("GameData/Sprites/dinoduck0000.png")
@@ -26,11 +28,27 @@ cactusbig = pygame.image.load("GameData/Sprites/cactusBig0000.png")
 cactushord = pygame.image.load("GameData/Sprites/cactusSmallMany0000.png")
 dinoicon = pygame.image.load("GameData/Sprites/dino0000.png")
 dinodead = pygame.image.load("GameData/Sprites/dinoDead0000.png")
-texture = dino1
+cloud = pygame.image.load("GameData/Sprites/cloud0000.png")
+
+#Values
+
+dinotexture = dino1
 running = True
 jumping = False
 duck = False
+groundStart = (0, 588)
+groundStop = (1280, 588)
+mincloud = 300
+maxcloud = 20
+cloudx = 300
+mintimeclouds = 60
+lastcloud = 0
+countcloud = True
 
+#colors
+black = (0, 0, 0)
+white = (255, 255, 255)
+grey = (83, 83, 83)
 
 def updatescreen():
     """
@@ -38,22 +56,39 @@ Used to refresh the screen after some changes, Fills the screen with the color, 
 then flips (updates) the screen
     :rtype: None
     """
-    screen.fill(0)
-    pygame.draw.line(screen, (83, 83, 83), (0, 612), (1280, 612))
-    screen.blit(texture, dinopos)
+    screen.fill((255, 255, 255))
+    pygame.draw.line(screen, grey, groundStart, groundStop)
+    screen.blit(dinotexture, dinopos)
     pygame.display.flip()
 
+'''def cloudspawn():
+    global lastcloud
+    if lastcloud >= mintimeclouds:
+        lastcloud = 0
+        ranspawn = random.randint(0, 2)
+        if ranspawn <= 1:
+            cloudheight = random.randint(mincloud, maxcloud)
+            screen.blit(cloud, (cloudx, cloudheight))
+            updatescreen()
+            countcloud = True
+'''
 
 while running:
+    #cloudspawn()
+    #if cloudx <= 0:
+    #    cloudx -= 1
+    #if countcloud:
+    #    lastcloud += 1
+
     if not jumping and not duck:
-        texture = dino1
+        dinotexture = dino1
         updatescreen()
-        texture = dino2
+        dinotexture = dino2
         updatescreen()
     if duck:
-        texture = dinoduck0
+        dinotexture = dinoduck0
         updatescreen()
-        texture = dinoduck1
+        dinotexture = dinoduck1
         updatescreen()
     updatescreen()
     for event in pygame.event.get():
@@ -101,7 +136,7 @@ while running:
         if keys[1]:
             jumping = True
             print('Jump')
-            texture = dinojump
+            dinotexture = dinojump
             for i in range(60):
                 dinopos[1] -= 2.5
                 # screen.fill(0)

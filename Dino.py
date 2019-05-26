@@ -1,6 +1,7 @@
 import pygame
 import time
 import random
+import threading
 from pygame.locals import *
 
 pygame.init()
@@ -16,7 +17,7 @@ keys = [False, False, False]
 
 # Loading sprites
 
-dino1 = pygame.image.load("GameData/Sprites/dinorun0000.png")
+DINO1 = pygame.image.load("GameData/Sprites/dinorun0000.png")
 dino2 = pygame.image.load("GameData/Sprites/dinorun0001.png")
 dinoduck0 = pygame.image.load("GameData/Sprites/dinoduck0000.png")
 dinoduck1 = pygame.image.load("GameData/Sprites/dinoduck0001.png")
@@ -30,9 +31,14 @@ dinoicon = pygame.image.load("GameData/Sprites/dino0000.png")
 dinodead = pygame.image.load("GameData/Sprites/dinoDead0000.png")
 cloud = pygame.image.load("GameData/Sprites/cloud0000.png")
 
-#Values
+# Values
 
-dinotexture = dino1
+obsPos = []
+obsList = []
+lastObs = 40
+speed = 0
+score = 76
+dinotexture = DINO1
 running = True
 jumping = False
 duck = False
@@ -45,10 +51,11 @@ mintimeclouds = 60
 lastcloud = 0
 countcloud = True
 
-#colors
+# colors
 black = (0, 0, 0)
 white = (255, 255, 255)
 grey = (83, 83, 83)
+
 
 def updatescreen():
     """
@@ -58,8 +65,11 @@ then flips (updates) the screen
     """
     screen.fill((255, 255, 255))
     pygame.draw.line(screen, grey, groundStart, groundStop)
+    for x in range(len(obsList)):
+        screen.blit(obsList[x], obsPos[x])
     screen.blit(dinotexture, dinopos)
     pygame.display.flip()
+
 
 '''def cloudspawn():
     global lastcloud
@@ -73,15 +83,61 @@ then flips (updates) the screen
             countcloud = True
 '''
 
-while running:
-    #cloudspawn()
-    #if cloudx <= 0:
-    #    cloudx -= 1
-    #if countcloud:
-    #    lastcloud += 1
 
+def addscore():
+    global score
+    threading.Timer(0.5, addscore).start()
+    score += 1
+    print(score)
+
+
+addscore()
+
+
+def obsSpawn():
+    """
+    gets random obs than puts it in an obsList and after it puts his [x,y] in obsPos
+    :return:
+    """
+    global score
+    global lastObs
+    print(score, lastObs)
+    if (score - lastObs) > 40:
+        lastObs = score
+        num = random.randint(0, 100)
+        if num <= 25:
+            obsList.append(cactussmall)
+            obsPos.append([width, 500])
+        elif 25 < num <= 45:
+            obsList.append(cactusbig)
+            obsPos.append([width, 500])
+        elif 45 < num <= 60:
+            obsList.append(cactushord)
+            obsPos.append([width, 500])
+        elif 60 < num <= 75 and score > 250:
+            obsList.append(berd0)
+            obsPos.append([width, 450])
+        elif 75 < num <= 88 and score > 250:
+            obsList.append(berd0)
+            obsPos.append([width, 500])
+        elif 88 < num <= 100 and score > 250:
+            obsList.append(berd0)
+            obsPos.append([width, 550])
+
+
+while running:
+    # score += 1
+
+    print(int(score))
+
+    # cloudspawn()
+    # if cloudx <= 0:
+    #    cloudx -= 1
+    # if countcloud:
+    #    lastcloud += 1
+    obsSpawn()
     if not jumping and not duck:
-        dinotexture = dino1
+        dinotexture = DINO1
         updatescreen()
         dinotexture = dino2
         updatescreen()
@@ -90,6 +146,16 @@ while running:
         updatescreen()
         dinotexture = dinoduck1
         updatescreen()
+    # moves obstacles forward and deletes them off screen
+    for x in range(len(obsPos)):
+        if obsPos[x][0] == 0 :
+            obsPos.pop(x)
+            obsList.pop(x)
+        elif obsPos[x][0] > -20:
+            obsPos[x][0] -= 1
+            # obsPos.insert(x, [obsPos[x][0] - 1, obsPos[x][1]])
+
+
     updatescreen()
     for event in pygame.event.get():
         # Check if X is pressed
@@ -100,10 +166,9 @@ while running:
         # Check for event KEYDOWN
 
         if event.type == pygame.KEYDOWN:
-            # Full screen key - F11
             if event.key == K_F11:
                 keys[0] = True
-            # Jump key(s) - Space and K_up
+            # Full screen key - F11
             if event.key == K_UP or event.key == K_SPACE:
                 keys[1] = True
             # Duck key - K_DOWN
@@ -112,7 +177,6 @@ while running:
 
         # Check for EVENT KEYUP
         if event.type == pygame.KEYUP:
-            # Full screen key - F11
             if event.key == K_F11:
                 keys[0] = False
             # Jump key(s) - Space and K_up
@@ -128,10 +192,10 @@ while running:
             # if not isFull:
             pygame.display.set_mode((width, height), pygame.FULLSCREEN, pygame.NOFRAME)
             # print(pygame.display.get_wm_info())
-                # isFull = True
+            # isFull = True
             # elif isFull:
-                # pygame.display.set_mode((width, height))
-                # isFull = False
+            # pygame.display.set_mode((width, height))
+            # isFull = False
             print('Toggled Full screen')
         if keys[1]:
             jumping = True

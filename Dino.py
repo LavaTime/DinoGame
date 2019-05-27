@@ -5,31 +5,39 @@ import threading
 from pygame.locals import *
 
 pygame.init()
+pygame.mixer.init()
+pygame.font.init()
 pygame.display.init()
-width, height = 1280, 720
-icon_surf = pygame.image.load("GameData/Sprites/dino0000.png")
-pygame.display.set_icon(icon_surf)
-screen = pygame.display.set_mode((width, height))
+WIDTH, HEIGHT = 1280, 720
+ICON_SURF = pygame.image.load("GameData/Sprites/dino0000.png")
+pygame.display.set_icon(ICON_SURF)
+screen = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption('Dinosaur Game')
 screen.fill((255, 255, 255))
 dinopos = [100, 500]
 keys = [False, False, False]
 
-# Loading sprites
+# Loading game files
 
 DINO1 = pygame.image.load("GameData/Sprites/dinorun0000.png")
-dino2 = pygame.image.load("GameData/Sprites/dinorun0001.png")
-dinoduck0 = pygame.image.load("GameData/Sprites/dinoduck0000.png")
-dinoduck1 = pygame.image.load("GameData/Sprites/dinoduck0001.png")
-dinojump = pygame.image.load("GameData/Sprites/dinoJump0000.png")
-berd0 = pygame.image.load("GameData/Sprites/berd.png")
-berd1 = pygame.image.load("GameData/Sprites/berd2.png")
-cactussmall = pygame.image.load("GameData/Sprites/cactusSmall0000.png")
-cactusbig = pygame.image.load("GameData/Sprites/cactusBig0000.png")
-cactushord = pygame.image.load("GameData/Sprites/cactusSmallMany0000.png")
-dinoicon = pygame.image.load("GameData/Sprites/dino0000.png")
-dinodead = pygame.image.load("GameData/Sprites/dinoDead0000.png")
-cloud = pygame.image.load("GameData/Sprites/cloud0000.png")
+DINO2 = pygame.image.load("GameData/Sprites/dinorun0001.png")
+DINODUCK0 = pygame.image.load("GameData/Sprites/dinoduck0000.png")
+DINODUCK1 = pygame.image.load("GameData/Sprites/dinoduck0001.png")
+DINOJUMP = pygame.image.load("GameData/Sprites/dinoJump0000.png")
+BIRD0 = pygame.image.load("GameData/Sprites/berd.png")
+BIRD1 = pygame.image.load("GameData/Sprites/berd2.png")
+CACTUSSMALL = pygame.image.load("GameData/Sprites/cactusSmall0000.png")
+CACTUSBIG = pygame.image.load("GameData/Sprites/cactusBig0000.png")
+CACTUSHORD = pygame.image.load("GameData/Sprites/cactusSmallMany0000.png")
+DINOICON = pygame.image.load("GameData/Sprites/dino0000.png")
+DINODEAD = pygame.image.load("GameData/Sprites/dinoDead0000.png")
+CLOUD = pygame.image.load("GameData/Sprites/cloud0000.png")
+
+JUMPSFX = "GameData/Sound effects/jump.ogg"
+DEATHSFX = "GameData/Sound effects/death.ogg"
+
+pygame.mixer.music.load(JUMPSFX)
+
 
 # Values
 
@@ -88,7 +96,7 @@ def addscore():
     global score
     threading.Timer(0.5, addscore).start()
     score += 1
-    print(score)
+    #print(score)
 
 
 addscore()
@@ -101,34 +109,43 @@ def obsSpawn():
     """
     global score
     global lastObs
-    print(score, lastObs)
+    # print(score, lastObs)
     if (score - lastObs) > 40:
-        lastObs = score
         num = random.randint(0, 100)
         if num <= 25:
-            obsList.append(cactussmall)
-            obsPos.append([width, 500])
+            obsList.append(CACTUSSMALL)
+            obsPos.append([WIDTH, 508])
+            lastObs = score
         elif 25 < num <= 45:
-            obsList.append(cactusbig)
-            obsPos.append([width, 500])
+            obsList.append(CACTUSBIG)
+            obsPos.append([WIDTH, 508])
+            lastObs = score
         elif 45 < num <= 60:
-            obsList.append(cactushord)
-            obsPos.append([width, 500])
-        elif 60 < num <= 75 and score > 250:
-            obsList.append(berd0)
-            obsPos.append([width, 450])
-        elif 75 < num <= 88 and score > 250:
-            obsList.append(berd0)
-            obsPos.append([width, 500])
+            obsList.append(CACTUSHORD)
+            obsPos.append([WIDTH, 508])
+            lastObs = score
+        elif 60 < num <= 75 and score > 250: # high
+            obsList.append(BIRD0)
+            obsPos.append([WIDTH, 370])
+            lastObs = score
+            print(60, 75)
+        elif 75 < num <= 88 and score > 250: # low
+            obsList.append(BIRD0)
+            obsPos.append([WIDTH, 500])
+            lastObs = score
+            print(75, 88)
         elif 88 < num <= 100 and score > 250:
-            obsList.append(berd0)
-            obsPos.append([width, 550])
+            # middle
+            obsList.append(BIRD0)
+            obsPos.append([WIDTH, 422])
+            lastObs = score
+            print(88, 100)
 
 
 while running:
     # score += 1
 
-    print(int(score))
+    #print(int(score))
 
     # cloudspawn()
     # if cloudx <= 0:
@@ -139,13 +156,14 @@ while running:
     if not jumping and not duck:
         dinotexture = DINO1
         updatescreen()
-        dinotexture = dino2
+        dinotexture = DINO2
         updatescreen()
     if duck:
-        dinotexture = dinoduck0
+        dinotexture = DINODUCK0
         updatescreen()
-        dinotexture = dinoduck1
+        dinotexture = DINODUCK1
         updatescreen()
+
     # moves obstacles forward and deletes them off screen
     for x in range(len(obsPos)):
         if obsPos[x][0] == 0 :
@@ -190,7 +208,7 @@ while running:
             # print(pygame.display.get_wm_info())
             # isFull = False
             # if not isFull:
-            pygame.display.set_mode((width, height), pygame.FULLSCREEN, pygame.NOFRAME)
+            pygame.display.set_mode((WIDTH, HEIGHT), pygame.FULLSCREEN, pygame.NOFRAME)
             # print(pygame.display.get_wm_info())
             # isFull = True
             # elif isFull:
@@ -199,8 +217,9 @@ while running:
             print('Toggled Full screen')
         if keys[1]:
             jumping = True
-            print('Jump')
-            dinotexture = dinojump
+            #print('Jump')
+            dinotexture = DINOJUMP
+            pygame.mixer.music.play()
             for i in range(60):
                 dinopos[1] -= 2.5
                 # screen.fill(0)
@@ -217,7 +236,7 @@ while running:
             jumping = False
             # Continue later - Jump animation - 30 FPS (Frames per second)
         if keys[2]:
-            print('Duck')
+            #print('Duck')
             duck = True
             dinopos[1] = 544
             # updatescreen()

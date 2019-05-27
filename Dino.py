@@ -105,7 +105,7 @@ def lose():
 '''
 
 
-def addscore():
+'''def addscore():
     global score
     threading.Timer(0.5, addscore).start()
     score += 1
@@ -114,7 +114,9 @@ def addscore():
 
 addscore()
 
+'''
 
+ # Obstacle spawniong
 def obsSpawn():
     """
     gets random obs than puts it in an obsList and after it puts his [x,y] in obsPos
@@ -156,58 +158,9 @@ def obsSpawn():
 
 
 while running:
-    scoretext = FONT.render("Score " + str(score), 1, (100, 100, 100))
-    # score += 1
 
-    #print(int(score))
+    # Get inputs
 
-    # cloudspawn()
-    # if cloudx <= 0:
-    #    cloudx -= 1
-    # if countcloud:
-    #    lastcloud += 1
-    obsSpawn()
-    if not jumping and not duck:
-        dinotexture = DINO1
-        updatescreen()
-        dinotexture = DINO2
-        updatescreen()
-    if duck:
-        dinotexture = DINODUCK0
-        updatescreen()
-        dinotexture = DINODUCK1
-        updatescreen()
-
-    # moves obstacles forward and deletes them off screen
-    for x in range(len(obsPos)):
-        if obsList[x] == BIRD0 and obsPos[x][1] == bird_low_y:
-            if(obsPos[x][0] - 96 < dinopos[0] < obsPos[x][0] + 92 and dinopos[1]+112 < bird_low_y):
-                lose()
-        elif obsList[x] == BIRD0 and obsPos[x][1] == bird_mid_y:
-            if obsPos[x][0] - 96 < dinopos[0] < obsPos[x][0] + 92 and dinopos[1]+112 < bird_mid_y :
-                lose()
-        elif obsList[x] == BIRD0 and obsPos[x][1] == bird_high_y:
-            if obsPos[x][0] - 96 < dinopos[0] < obsPos[x][0] + 92 and bird_high_y + 80 < dinopos[1]+112 < bird_high_y :
-                lose()
-        elif obsList[x] == CACTUSBIG:
-            if(obsPos[x][0] - 60 < dinopos[0] < obsPos[x][0] + 92 and dinopos[1]+112 < cactusbig_y) :
-                lose()
-        elif obsList[x] == CACTUSHORD:
-            if (obsPos[x][0] - 120 < dinopos[0] < obsPos[x][0] + 92 and dinopos[1]+112 < cactushord_y) :
-                lose()
-        elif obsList[x] == CACTUSSMALL:
-            if (obsPos[x][0] - 40 < dinopos[0] < obsPos[x][0] + 92 and dinopos[1]+112 < cactussmall_y) :
-                lose()
-        # moves obs forward and deletes them
-        if obsPos[x][0] < 5:
-            obsPos.pop(x)
-            obsList.pop(x)
-        elif obsPos[x][0] > -20:
-            obsPos[x][0] -= score/15
-
-
-
-    updatescreen()
     for event in pygame.event.get():
         # Check if X is pressed
         if event.type == pygame.QUIT:
@@ -237,42 +190,86 @@ while running:
             if event.key == K_DOWN:
                 keys[2] = False
 
-        if keys[0]:
-            # print(pygame.display.get_wm_info())
-            # isFull = False
-            # if not isFull:
-            pygame.display.set_mode((WIDTH, HEIGHT), pygame.FULLSCREEN, pygame.NOFRAME)
-            # print(pygame.display.get_wm_info())
-            # isFull = True
-            # elif isFull:
-            # pygame.display.set_mode((width, height))
-            # isFull = False
-            print('Toggled Full screen')
-        if keys[1]:
-            jumping = True
-            #print('Jump')
-            dinotexture = DINOJUMP
-            pygame.mixer.music.play()
-            for i in range(60):
-                dinopos[1] -= 2.5
-                # screen.fill(0)
-                # screen.blit(dino1, dinopos)
-                # pygame.display.flip()
-                updatescreen()
-            time.sleep(0.1)
-            for i in range(60):
-                dinopos[1] += 2.5
-                # screen.fill(0)     Remove later - used instead of updatescreen()
-                # screen.blit(dino1, dinopos)
-                # pygame.display.flip()
-                updatescreen()
-            jumping = False
-            # Continue later - Jump animation - 30 FPS (Frames per second)
-        if keys[2]:
-            #print('Duck')
-            duck = True
-            dinopos[1] = 544
-            # updatescreen()
-        if not keys[2]:
-            duck = False
-            dinopos[1] = 500
+        # Process if key pressed
+    if keys[0]:
+        #Changed the screen to full
+        pygame.display.set_mode((WIDTH, HEIGHT), pygame.FULLSCREEN, pygame.NOFRAME)
+        print('Toggled Full screen')
+
+    if keys[1]:
+        # Jump
+        jumping = True
+        # print('Jump')
+        dinotexture = DINOJUMP
+        # Change the texture of the dino to the jump texture
+        pygame.mixer.music.play()
+        #Play the sound of jump
+
+        # Increase the Dino's Y pos and then wait before moving do wn again
+        for i in range(60):
+            dinopos[1] -= 2.5
+        time.sleep(0.1)
+        for i in range(60):
+            dinopos[1] += 2.5
+        jumping = False
+
+    if keys[2]:
+        # Duck function
+        # print('Duck')
+        duck = True
+        dinopos[1] = 544 # Texture related
+    if not keys[2]: # make it that duck needs to be held
+        duck = False
+        dinopos[1] = 500
+
+    # moves obstacles forward and deletes them off screen
+    for x in range(len(obsPos)):
+        if obsList[x] == BIRD0 and obsPos[x][1] == bird_low_y:
+            if(obsPos[x][0] - 96 < dinopos[0] < obsPos[x][0] + 92 and dinopos[1]+112 < bird_low_y):
+                lose()
+        elif obsList[x] == BIRD0 and obsPos[x][1] == bird_mid_y:
+            if obsPos[x][0] - 96 < dinopos[0] < obsPos[x][0] + 92 and dinopos[1]+112 < bird_mid_y :
+                lose()
+        elif obsList[x] == BIRD0 and obsPos[x][1] == bird_high_y:
+            if obsPos[x][0] - 96 < dinopos[0] < obsPos[x][0] + 92 and bird_high_y + 80 < dinopos[1]+112 < bird_high_y :
+                lose()
+        elif obsList[x] == CACTUSBIG:
+            if(obsPos[x][0] - 60 < dinopos[0] < obsPos[x][0] + 92 and dinopos[1]+112 < cactusbig_y) :
+                lose()
+        elif obsList[x] == CACTUSHORD:
+            if (obsPos[x][0] - 120 < dinopos[0] < obsPos[x][0] + 92 and dinopos[1]+112 < cactushord_y) :
+                lose()
+        elif obsList[x] == CACTUSSMALL:
+            if (obsPos[x][0] - 40 < dinopos[0] < obsPos[x][0] + 92 and dinopos[1]+112 < cactussmall_y) :
+                lose()
+        # moves obs forward and deletes them
+        if obsPos[x][0] < 5:
+            obsPos.pop(x)
+            obsList.pop(x)
+        elif obsPos[x][0] > -20:
+            obsPos[x][0] -= score/15
+
+        score += 0.2
+
+
+    # dino legs drawing
+    if not jumping and not duck:
+        if dinotexture == DINO2:
+            dinotexture = DINO1
+        if dinotexture == DINO1:
+            dinotexture = DINO2
+    if duck:
+        if dinotexture == DINODUCK1:
+            dinotexture = DINODUCK0
+        if dinotexture == DINODUCK0:
+            dinotexture = DINODUCK1
+
+
+    # Render the score to the screen
+    scoretext = FONT.render("Score " + str(score), 1, (100, 100, 100))
+
+    #Spawn Obstalces
+    obsSpawn()
+
+    updatescreen()
+    time.sleep(0.05)

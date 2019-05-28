@@ -53,7 +53,7 @@ obsPos = []
 obsList = []
 lastObs = 40
 speed = 0
-score = 76
+score = 0
 dinotexture = DINO1
 running = True
 jumping = False
@@ -105,16 +105,16 @@ def lose():
 '''
 
 
-'''def addscore():
+def addscore():
     global score
-    threading.Timer(0.5, addscore).start()
+    threading.Timer(0.25, addscore).start()
     score += 1
     #print(score)
 
 
 addscore()
 
-'''
+
 
  # Obstacle spawniong
 def obsSpawn():
@@ -272,4 +272,4 @@ while running:
     obsSpawn()
 
     updatescreen()
-    time.sleep(0.05)
+    #time.sleep(0.05)

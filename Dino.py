@@ -42,6 +42,9 @@ pygame.mixer.music.load(JUMPSFX)
 
 # Values
 
+dinoBox = pygame.Rect(100, 500, 96, 112)
+obsbox = None
+sizes = {BIRD0: (92, 80), CACTUSSMALL: (40, 80), CACTUSHORD: (120, 80), CACTUSBIG: (60, 120)}
 losetext = FONT.render("You Lose", 1, (100, 100, 100))
 cactusbig_y = 508
 cactushord_y = 508
@@ -51,9 +54,9 @@ bird_mid_y = 422
 bird_high_y = 370
 obsPos = []
 obsList = []
-lastObs = 40
+lastObs = 10
 speed = 0
-score = 76
+score = 0
 dinotexture = DINO1
 running = True
 jumping = False
@@ -91,7 +94,10 @@ def lose():
     screen.fill((255, 255, 255))
     screen.blit(losetext, (WIDTH/2, HEIGHT/2))
     pygame.time.delay(2000)
+    pygame.quit()
+    exit(0)
     running = False
+
 '''def cloudspawn():
     global lastcloud
     if lastcloud >= mintimeclouds:
@@ -107,10 +113,51 @@ def lose():
 
 def addscore():
     global score
-    threading.Timer(0.5, addscore).start()
+    threading.Timer(0.25, addscore).start()
     score += 1
     #print(score)
 
+def obs():
+    """
+    moves obs forward, deletes obs when done,checks for collision.
+    :return:
+    """
+    global obsBox, obsPos, dinoBox, score, obsList, dinopos
+    # moves obstacles forward and deletes them off screen and ends game if dino collides with obs
+    for x in range(len(obsPos)):
+        # check for collision
+        obsBox = pygame.Rect(obsPos[x][0]+20, obsPos[x][1]+10, sizes[obsList[x]][0]-20, sizes[obsList[x]][1])
+
+        if obsBox.colliderect(dinoBox):
+            lose()
+        # moves obs forward and deletes them
+        if obsPos[x][0] < 5:
+            obsPos.pop(x)
+            obsList.pop(x)
+        elif obsPos[x][0] > -20:
+            obsPos[x][0] -= score/15
+
+
+
+def obs_duck():
+    """
+    moves obs forward, deletes obs when done,checks for collision.
+    :return:
+    """
+    global obsBox, obsPos, dinoBox, score, obsList, dinopos
+    # moves obstacles forward and deletes them off screen and ends game if dino collides with obs
+    for x in range(len(obsPos)):
+        # check for collision
+        obsBox = pygame.Rect(obsPos[x][0]+20, obsPos[x][1]+75, sizes[obsList[x]][0]-20, sizes[obsList[x]][1])
+
+        if obsBox.colliderect(dinoBox):
+            lose()
+        # moves obs forward and deletes them
+        if obsPos[x][0] < 5:
+            obsPos.pop(x)
+            obsList.pop(x)
+        elif obsPos[x][0] > -20:
+            obsPos[x][0] -= score/15
 
 addscore()
 
@@ -123,7 +170,7 @@ def obsSpawn():
     global score
     global lastObs
     # print(score, lastObs)
-    if (score - lastObs) > score/15:
+    if (score - lastObs) > 20:
         num = random.randint(0, 100)
         if num <= 25:
             obsList.append(CACTUSSMALL)
@@ -137,17 +184,17 @@ def obsSpawn():
             obsList.append(CACTUSHORD)
             obsPos.append([WIDTH, cactushord_y])
             lastObs = score
-        elif 60 < num <= 75 and score > 250: # high
+        elif 60 < num <= 75 and score > 100: # high
             obsList.append(BIRD0)
             obsPos.append([WIDTH, bird_high_y])
             lastObs = score
             print(60, 75)
-        elif 75 < num <= 88 and score > 250: # low
+        elif 75 < num <= 88 and score > 100: # low
             obsList.append(BIRD0)
             obsPos.append([WIDTH, bird_low_y])
             lastObs = score
             print(75, 88)
-        elif 88 < num <= 100 and score > 250:
+        elif 88 < num <= 100 and score > 100:
             # middle
             obsList.append(BIRD0)
             obsPos.append([WIDTH, bird_mid_y])
@@ -158,7 +205,7 @@ def obsSpawn():
 while running:
     scoretext = FONT.render("Score " + str(score), 1, (100, 100, 100))
     # score += 1
-
+    dinoBox = pygame.Rect(dinopos[0], dinopos[1], 96, 100)
     #print(int(score))
 
     # cloudspawn()
@@ -173,38 +220,13 @@ while running:
         dinotexture = DINO2
         updatescreen()
     if duck:
+        obs_duck()
         dinotexture = DINODUCK0
         updatescreen()
         dinotexture = DINODUCK1
         updatescreen()
 
-    # moves obstacles forward and deletes them off screen
-    for x in range(len(obsPos)):
-        if obsList[x] == BIRD0 and obsPos[x][1] == bird_low_y:
-            if(obsPos[x][0] - 96 < dinopos[0] < obsPos[x][0] + 92 and dinopos[1]+112 < bird_low_y):
-                lose()
-        elif obsList[x] == BIRD0 and obsPos[x][1] == bird_mid_y:
-            if obsPos[x][0] - 96 < dinopos[0] < obsPos[x][0] + 92 and dinopos[1]+112 < bird_mid_y :
-                lose()
-        elif obsList[x] == BIRD0 and obsPos[x][1] == bird_high_y:
-            if obsPos[x][0] - 96 < dinopos[0] < obsPos[x][0] + 92 and bird_high_y + 80 < dinopos[1]+112 < bird_high_y :
-                lose()
-        elif obsList[x] == CACTUSBIG:
-            if(obsPos[x][0] - 60 < dinopos[0] < obsPos[x][0] + 92 and dinopos[1]+112 < cactusbig_y) :
-                lose()
-        elif obsList[x] == CACTUSHORD:
-            if (obsPos[x][0] - 120 < dinopos[0] < obsPos[x][0] + 92 and dinopos[1]+112 < cactushord_y) :
-                lose()
-        elif obsList[x] == CACTUSSMALL:
-            if (obsPos[x][0] - 40 < dinopos[0] < obsPos[x][0] + 92 and dinopos[1]+112 < cactussmall_y) :
-                lose()
-        # moves obs forward and deletes them
-        if obsPos[x][0] < 5:
-            obsPos.pop(x)
-            obsList.pop(x)
-        elif obsPos[x][0] > -20:
-            obsPos[x][0] -= score/15
-
+    obs()
 
 
     updatescreen()
@@ -253,15 +275,19 @@ while running:
             #print('Jump')
             dinotexture = DINOJUMP
             pygame.mixer.music.play()
-            for i in range(60):
+            for i in range(80):
                 dinopos[1] -= 2.5
+                dinoBox = pygame.Rect(dinopos[0], dinopos[1], 96, 100)
+                obs()
                 # screen.fill(0)
                 # screen.blit(dino1, dinopos)
                 # pygame.display.flip()
                 updatescreen()
             time.sleep(0.1)
-            for i in range(60):
+            for i in range(80):
                 dinopos[1] += 2.5
+                dinoBox = pygame.Rect(dinopos[0], dinopos[1], 96, 100)
+                obs()
                 # screen.fill(0)     Remove later - used instead of updatescreen()
                 # screen.blit(dino1, dinopos)
                 # pygame.display.flip()

@@ -33,6 +33,7 @@ CACTUSHORD = pygame.image.load("GameData/Sprites/cactusSmallMany0000.png")
 DINOICON = pygame.image.load("GameData/Sprites/dino0000.png")
 DINODEAD = pygame.image.load("GameData/Sprites/dinoDead0000.png")
 CLOUD = pygame.image.load("GameData/Sprites/cloud0000.png")
+JUMPHEIGHTS = [5, 7, 9, 11, 13, 15, 17, 19, 21, 23, 25, 25, 23, 21, 19, 17, 15, 13, 11, 9 ,7 , 5]
 
 JUMPSFX = "GameData/Sound effects/jump.ogg"
 DEATHSFX = "GameData/Sound effects/death.ogg"
@@ -232,7 +233,7 @@ while running:
         print('Toggled Full screen')
 
     if keys[1]:
-        # Jump
+        '''# Jump
         jumping = True
         # print('Jump')
         dinotexture = DINOJUMP
@@ -246,7 +247,17 @@ while running:
         time.sleep(0.1)
         for i in range(60):
             dinopos[1] += 2.5
-        jumping = False
+        jumping = False'''
+        if not jumping:
+            jumping = True
+            jumpTime = 0
+    if jumping:
+        if jumpTime < len(JUMPHEIGHTS):
+            dinopos[1] = JUMPHEIGHTS[jumpTime]
+            jumpTime += 1
+            print(jumpTime, dinopos[1])
+        else:
+            jumping = False
 
     if keys[2]:
         # Duck function
@@ -315,3 +326,24 @@ while running:
         time.sleep(gameclock.get_time()/1000)
     elif gameclock.get_time() < frameRateMS:
         time.sleep((frameRateMS - gameclock.get_time())/1000)
+
+'''if !jumping && jumpTime >= jumpHeights.length
+    jumping = true
+    jumpTime = 0
+if jumpTime < jumpHeights.length:
+    dinoY = jumpHeights[jumpTime]
+jumpTime++'''
+
+'''
+jumpHeights = [5, 10, 14, 18, 21, 24, 25, 25, 25, 10, 0]
+if jumpButtonThing:
+    if !jumping:
+        jumping = true
+        jumpTime = 0
+if jumping:
+    if jumpTime < jumpHeights.length:
+        dinoY = jumpHeights[jumpTime]
+        jumpTime++
+    else:
+        jumping = false
+'''

@@ -33,7 +33,7 @@ CACTUSHORD = pygame.image.load("GameData/Sprites/cactusSmallMany0000.png")
 DINOICON = pygame.image.load("GameData/Sprites/dino0000.png")
 DINODEAD = pygame.image.load("GameData/Sprites/dinoDead0000.png")
 CLOUD = pygame.image.load("GameData/Sprites/cloud0000.png")
-JUMPHEIGHTS = [5, 7, 9, 11, 13, 15, 17, 19, 21, 23, 25, 25, 23, 21, 19, 17, 15, 13, 11, 9 ,7 , 5]
+JUMPHEIGHTS = [500, 490, 480, 470, 460, 450, 440, 430, 420, 410, 400, 400, 410, 420, 430, 440, 450, 460, 470, 480, 490, 500]
 
 JUMPSFX = "GameData/Sound effects/jump.ogg"
 DEATHSFX = "GameData/Sound effects/death.ogg"
@@ -161,36 +161,37 @@ def obsSpawn():
     global score
     global lastObs
     # print(score, lastObs)
-    if (score - lastObs) > score/10:
+    if (score - lastObs) > score/7:
         num = random.randint(0, 100)
+        xaddition = random.randint(0, 13)
         if num <= 25:
             obsList.append(CACTUSSMALL)
-            obsPos.append([WIDTH, cactussmall_y])
+            obsPos.append([(WIDTH - xaddition), cactussmall_y])
             lastObs = score
         elif 25 < num <= 45:
             obsList.append(CACTUSBIG)
-            obsPos.append([WIDTH, cactusbig_y])
+            obsPos.append([(WIDTH - xaddition), cactusbig_y])
             lastObs = score
         elif 45 < num <= 60:
             obsList.append(CACTUSHORD)
-            obsPos.append([WIDTH, cactushord_y])
+            obsPos.append([(WIDTH - xaddition), cactushord_y])
             lastObs = score
         elif 60 < num <= 75 and score > 250: # high
             obsList.append(BIRD0)
-            obsPos.append([WIDTH, bird_high_y])
+            obsPos.append([(WIDTH - xaddition), bird_high_y])
             lastObs = score
-            print(60, 75)
+            #print(60, 75)
         elif 75 < num <= 88 and score > 250: # low
             obsList.append(BIRD0)
-            obsPos.append([WIDTH, bird_low_y])
+            obsPos.append([(WIDTH - xaddition), bird_low_y])
             lastObs = score
-            print(75, 88)
+            #print(75, 88)
         elif 88 < num <= 100 and score > 250:
             # middle
             obsList.append(BIRD0)
-            obsPos.append([WIDTH, bird_mid_y])
+            obsPos.append([(WIDTH - xaddition), bird_mid_y])
             lastObs = score
-            print(88, 100)
+            #print(88, 100)
 
 
 while running:
@@ -233,41 +234,35 @@ while running:
         print('Toggled Full screen')
 
     if keys[1]:
-        '''# Jump
-        jumping = True
-        # print('Jump')
-        dinotexture = DINOJUMP
-        # Change the texture of the dino to the jump texture
         pygame.mixer.music.play()
-        #Play the sound of jump
-
-        # Increase the Dino's Y pos and then wait before moving do wn again
-        for i in range(60):
-            dinopos[1] -= 2.5
-        time.sleep(0.1)
-        for i in range(60):
-            dinopos[1] += 2.5
-        jumping = False'''
         if not jumping:
             jumping = True
             jumpTime = 0
-    if jumping:
-        if jumpTime < len(JUMPHEIGHTS):
-            dinopos[1] = JUMPHEIGHTS[jumpTime]
-            jumpTime += 1
-            print(jumpTime, dinopos[1])
-        else:
-            jumping = False
+
 
     if keys[2]:
         # Duck function
         # print('Duck')
         duck = True
         dinopos[1] = 544 # Texture related
-    if not keys[2]: # make it that duck needs to be held
-        duck = False
-        dinopos[1] = 500
+        #dinotexture = DINODUCK0
+    #elif not keys[2]: # make it that duck needs to be held
+     #   duck = False
+      #  dinopos[1] = 500
+        #dinotexture = DINO1
 
+
+#500 - 10 *
+    if jumping:
+        if jumpTime < len(JUMPHEIGHTS):
+            dinopos[1] = JUMPHEIGHTS[jumpTime]
+            jumpTime += 1
+            #print(jumpTime, dinopos[1])
+        else:
+            jumping = False
+
+    if not duck and not jumping:
+        dinopos[1] = 500
 
     checkCollision()
     moveObstacles()
@@ -318,32 +313,10 @@ while running:
 
     #Spawn Obstalces
     obsSpawn()
-    score += 0.04
+    score += 0.15
     updatescreen()
     legscounter += 1
     gameclock.tick()
-    if gameclock.get_time() > 0:
-        time.sleep(gameclock.get_time()/1000)
-    elif gameclock.get_time() < frameRateMS:
+    #print(gameclock.get_time(), (frameRateMS - gameclock.get_time())/1000)
+    if gameclock.get_time() < frameRateMS:
         time.sleep((frameRateMS - gameclock.get_time())/1000)
-
-'''if !jumping && jumpTime >= jumpHeights.length
-    jumping = true
-    jumpTime = 0
-if jumpTime < jumpHeights.length:
-    dinoY = jumpHeights[jumpTime]
-jumpTime++'''
-
-'''
-jumpHeights = [5, 10, 14, 18, 21, 24, 25, 25, 25, 10, 0]
-if jumpButtonThing:
-    if !jumping:
-        jumping = true
-        jumpTime = 0
-if jumping:
-    if jumpTime < jumpHeights.length:
-        dinoY = jumpHeights[jumpTime]
-        jumpTime++
-    else:
-        jumping = false
-'''

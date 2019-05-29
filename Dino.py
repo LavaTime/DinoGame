@@ -226,6 +226,7 @@ while running:
             # Duck key - K_DOWN
             if event.key == K_DOWN:
                 keys[2] = False
+                duck = False
 
         # Process if key pressed
     if keys[0]:
@@ -263,6 +264,11 @@ while running:
 
     if not duck and not jumping:
         dinopos[1] = 500
+
+    if duck and not jumping and (dinotexture != DINODUCK0 or dinotexture != DINODUCK1):
+        dinotexture = DINODUCK0
+    if (not duck or jumping) and (dinotexture == DINODUCK0 or dinotexture == DINODUCK1):
+        dinotexture = DINO1
 
     checkCollision()
     moveObstacles()

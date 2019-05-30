@@ -33,7 +33,8 @@ CACTUSHORD = pygame.image.load("GameData/Sprites/cactusSmallMany0000.png")
 DINOICON = pygame.image.load("GameData/Sprites/dino0000.png")
 DINODEAD = pygame.image.load("GameData/Sprites/dinoDead0000.png")
 CLOUD = pygame.image.load("GameData/Sprites/cloud0000.png")
-JUMPHEIGHTS = [500, 490, 480, 470, 460, 450, 440, 430, 420, 410, 400, 400, 410, 420, 430, 440, 450, 460, 470, 480, 490, 500]
+JUMPHEIGHTS =[500, 480, 455, 420, 400, 375, 350, 320, 300, 280, 300, 320, 350, 375, 400, 420, 455, 480, 500]
+#JUMPHEIGHTS = [500, 490, 480, 470, 460, 450, 440, 430, 420, 410, 400, 400, 410, 420, 430, 440, 450, 460, 470, 480, 490, 500]
 
 JUMPSFX = "GameData/Sound effects/jump.ogg"
 DEATHSFX = "GameData/Sound effects/death.ogg"
@@ -42,8 +43,8 @@ pygame.mixer.music.load(JUMPSFX)
 
 
 # Values
-
-dinoBox = pygame.Rect(100, 500, 96, 112)
+obsSpawnd = 20
+dinoBox = pygame.Rect(dinopos[0], dinopos[1], 96, 112)
 obsbox = None
 sizes = {BIRD0: (92, 80), CACTUSSMALL: (40, 80), CACTUSHORD: (120, 80), CACTUSBIG: (60, 120)}
 losetext = FONT.render("You Lose", 1, (100, 100, 100))
@@ -56,7 +57,7 @@ bird_high_y = 370
 obsPos = []
 obsList = []
 lastObs = 40
-speed = 0
+speed = 10
 score = 0
 dinotexture = DINO1
 running = True
@@ -134,10 +135,10 @@ def checkCollision():
     # Checks if object is colliding with the hitbox
     for x in range(len(obsPos)):
         # check for collision
-        if dinopos[1] <= 500:
-            obsBox = pygame.Rect(obsPos[x][0]+20, obsPos[x][1]+10, sizes[obsList[x]][0]-20, sizes[obsList[x]][1])
-        else:
-            obsBox = pygame.Rect(obsPos[x][0] + 20, obsPos[x][1] + 75, sizes[obsList[x]][0] - 20, sizes[obsList[x]][1])
+
+        obsBox = pygame.Rect(obsPos[x][0]+20, obsPos[x][1]+10, sizes[obsList[x]][0] - 20, sizes[obsList[x]][1])
+        #else:
+        #    obsBox = pygame.Rect(obsPos[x][0] + 20, obsPos[x][1] + 75, sizes[obsList[x]][0] - 20, sizes[obsList[x]][1])
 
         if obsBox.colliderect(dinoBox):
             lose()
@@ -150,7 +151,7 @@ def moveObstacles():
             obsPos.pop(x)
             obsList.pop(x)
         elif obsPos[x][0] > -20:
-            obsPos[x][0] -= score/15
+            obsPos[x][0] -= speed/2
 
  # Obstacle spawniong
 def obsSpawn():
@@ -158,10 +159,10 @@ def obsSpawn():
     gets random obs than puts it in an obsList and after it puts his [x,y] in obsPos
     :return:
     """
-    global score
+    global score, obsSpawnd
     global lastObs
     # print(score, lastObs)
-    if (score - lastObs) > score/7:
+    if (score - lastObs) > obsSpawnd:
         num = random.randint(0, 100)
         xaddition = random.randint(0, 13)
         if num <= 25:
@@ -195,9 +196,11 @@ def obsSpawn():
 
 
 while running:
+    dinoBox = pygame.Rect(dinopos[0], dinopos[1], 96, 112)
     gameclock.tick()
     # Get inputs
-
+    if (score%200)==0:
+        obsSpawnd += 6
     for event in pygame.event.get():
         # Check if X is pressed
         if event.type == pygame.QUIT:
@@ -319,7 +322,8 @@ while running:
 
     #Spawn Obstalces
     obsSpawn()
-    score += 0.15
+    score += 0.35
+    speed += 0.1
     updatescreen()
     legscounter += 1
     gameclock.tick()

@@ -146,7 +146,10 @@ def checkCollision():
 def moveObstacles():
     global obsBox, obsPos, dinoBox, score, obsList, dinopos
         # moves obs forward and deletes them
-    for x in range(len(obsPos)):
+    for x in range(len(obsPos)-1):
+        print(obsPos)
+        print(obsPos[x])
+        print(obsPos[x][0])
         if obsPos[x][0] < 5:
             obsPos.pop(x)
             obsList.pop(x)
@@ -173,7 +176,7 @@ def obsSpawn():
             obsList.append(CACTUSBIG)
             obsPos.append([(WIDTH - xaddition), cactusbig_y])
             lastObs = score
-        elif 45 < num <= 60:
+        elif 45 < num <= 60 and score > 100:
             obsList.append(CACTUSHORD)
             obsPos.append([(WIDTH - xaddition), cactushord_y])
             lastObs = score
